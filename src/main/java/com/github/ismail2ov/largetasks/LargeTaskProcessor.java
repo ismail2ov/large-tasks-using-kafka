@@ -1,11 +1,14 @@
 package com.github.ismail2ov.largetasks;
 
+import java.time.Duration;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LargeTaskProcessor {
 
-    public boolean run() {
+    public boolean run() throws InterruptedException {
+        Thread.sleep(Duration.ofSeconds(5));
+
         return true;
     }
 }
