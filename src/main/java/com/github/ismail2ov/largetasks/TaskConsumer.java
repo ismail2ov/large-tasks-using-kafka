@@ -1,7 +1,9 @@
 package com.github.ismail2ov.largetasks;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -12,24 +14,30 @@ public class TaskConsumer {
 
     public static final String INPUT_TOPIC = "input-topic";
     public static final String STATUS_TOPIC = "status-topic";
+    public static final String CONTAINER_ID = "pausable-consumer";
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-
     private final LargeTaskProcessor taskProcessor;
+    private final KafkaContainerService kafkaContainerService;
+    private final AsyncTaskExecutor executor;
 
-    @KafkaListener(topics = INPUT_TOPIC)
+    @KafkaListener(id = CONTAINER_ID, topics = INPUT_TOPIC)
     public void consume(ConsumerRecord<String, String> consumerRecord) {
-        try {
-            boolean isSuccess = taskProcessor.run();
-            if (isSuccess) {
-                this.publishStatusOf(consumerRecord.value(), "FINISHED");
-            } else {
-                this.publishStatusOf(consumerRecord.value(), "FAILED");
-            }
-        } catch (Exception e) {
-            this.publishStatusOf(consumerRecord.value(), "ERROR");
-            throw new RuntimeException(e);
-        }
+        kafkaContainerService.pauseConsume(CONTAINER_ID);
+
+        executor.submitCompletable(() -> taskProcessor.run(consumerRecord.value()))
+            .whenComplete((isSuccess, exception) -> {
+                if (Objects.isNull(exception)) {
+                    if (Boolean.TRUE.equals(isSuccess)) {
+                        this.publishStatusOf(consumerRecord.value(), "FINISHED");
+                    } else {
+                        this.publishStatusOf(consumerRecord.value(), "FAILED");
+                    }
+                } else {
+                    this.publishStatusOf(consumerRecord.value(), "ERROR");
+                }
+                kafkaContainerService.resumeConsumer(CONTAINER_ID);
+            });
     }
 
     private void publishStatusOf(String value, String status) {
