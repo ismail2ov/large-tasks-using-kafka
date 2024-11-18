@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 public class LargeTaskProcessor {
 
     public boolean run(String task) throws InterruptedException {
-        Thread.sleep(Duration.ofSeconds(5));
+        int seconds = (task.equals("2")) ? 10 : 5;
+        Thread.sleep(Duration.ofSeconds(seconds));
 
         return true;
     }
