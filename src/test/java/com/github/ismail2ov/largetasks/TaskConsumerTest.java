@@ -3,9 +3,10 @@ package com.github.ismail2ov.largetasks;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,15 +27,18 @@ class TaskConsumerTest {
 
     @Test
     void testLargeTaskProcessing() {
-        String task = "1";
-        String expectedMessage = String.format("The status of task %s is %s", task, "FINISHED");
+        List<String> tasks = List.of("1", "2", "3", "4", "5");
+        List<String> expectedMessages = new ArrayList<>();
 
-        kafkaTemplate.send(TaskConsumer.INPUT_TOPIC, task);
+        for (String t : tasks) {
+            kafkaTemplate.send(TaskConsumer.INPUT_TOPIC, t);
+            expectedMessages.add(String.format("The status of task %s is %s", t, "FINISHED"));
+        }
 
         Consumer<String, String> testConsumer = consumerFactory.createConsumer();
         testConsumer.subscribe(List.of(TaskConsumer.STATUS_TOPIC));
-        ConsumerRecord<String, String> received = KafkaTestUtils.getSingleRecord(testConsumer, TaskConsumer.STATUS_TOPIC, Duration.ofSeconds(30L));
+        ConsumerRecords<String, String> received = KafkaTestUtils.getRecords(testConsumer, Duration.ofSeconds(60L), 5);
 
-        assertThat(received.value()).isEqualTo(expectedMessage);
+        assertThat(received).extracting("value").containsExactlyElementsOf(expectedMessages);
     }
 }
