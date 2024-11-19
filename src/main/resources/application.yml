@@ -12,9 +12,3 @@ spring:
     properties:
       max.poll.interval.ms: 2000
       max.poll.records: 1
-
-logging:
-  level:
-    root: INFO
-    org.springframework.kafka: DEBUG
-    org.apache.kafka.clients.consumer.internals: DEBUG
