@@ -1,21 +1,17 @@
 package com.github.ismail2ov.largetasks;
 
+import java.util.concurrent.Executors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.support.TaskExecutorAdapter;
 
 @Configuration
 public class ExecutorConfig {
 
     @Bean
     public AsyncTaskExecutor taskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
-        executor.initialize();
-
-        return executor;
+        return new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());
     }
 
 }
