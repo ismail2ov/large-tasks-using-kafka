@@ -12,3 +12,7 @@ spring:
     properties:
       max.poll.interval.ms: 2000
       max.poll.records: 1
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
