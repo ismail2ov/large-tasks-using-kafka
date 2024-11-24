@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class LargeTaskProcessor {
 
     public boolean run(String task) throws InterruptedException {
-        log.info("Processing task {}", task);
+        log.info("Processing task {}, Virtual Thread: {}", task, Thread.currentThread().isVirtual());
 
         int seconds = (task.equals("2")) ? 10 : 5;
         Thread.sleep(Duration.ofSeconds(seconds));
