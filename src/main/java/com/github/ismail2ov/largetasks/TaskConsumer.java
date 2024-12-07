@@ -21,7 +21,7 @@ public class TaskConsumer {
     private final KafkaContainerService kafkaContainerService;
     private final AsyncTaskExecutor executor;
 
-    @KafkaListener(id = CONTAINER_ID, topics = INPUT_TOPIC)
+    @KafkaListener(id = CONTAINER_ID, topics = INPUT_TOPIC, idIsGroup = false)
     public void consume(ConsumerRecord<String, String> consumerRecord) {
         kafkaContainerService.pauseConsume(CONTAINER_ID);
 

@@ -35,7 +35,7 @@ class TaskConsumerTest {
             expectedMessages.add(String.format("The status of task %s is %s", t, "FINISHED"));
         }
 
-        Consumer<String, String> testConsumer = consumerFactory.createConsumer();
+        Consumer<String, String> testConsumer = consumerFactory.createConsumer("test-consumer-group-id", "test");
         testConsumer.subscribe(List.of(TaskConsumer.STATUS_TOPIC));
         ConsumerRecords<String, String> received = KafkaTestUtils.getRecords(testConsumer, Duration.ofSeconds(60L), 5);
 
