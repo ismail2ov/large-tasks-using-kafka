@@ -25,7 +25,7 @@ public class TaskConsumer {
         this.kafkaTemplate = kafkaTemplate;
         this.taskProcessor = taskProcessor;
         this.kafkaContainerService = kafkaContainerService;
-        this.executor = new TaskExecutorAdapter(Executors.newSingleThreadExecutor());
+        this.executor = new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());
     }
 
     @KafkaListener(id = CONTAINER_ID, topics = INPUT_TOPIC, idIsGroup = false)
