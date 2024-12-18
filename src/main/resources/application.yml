@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: large-tasks-using-kafka
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: my-consumer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    properties:
+      max.poll.interval.ms: 2000
+      max.poll.records: 1
+
+logging:
+  level:
+    root: INFO
+    org.apache.kafka.clients.consumer.internals: DEBUG
+    org.apache.kafka.clients.consumer.KafkaConsumer: DEBUG
+    org.apache.kafka.clients.consumer.internals.Fetcher: DEBUG
+    org.springframework.kafka: INFO
+    org.apache.kafka.clients.consumer.internals.Heartbeat: DEBUG
+    org.apache.kafka.clients.consumer: DEBUG
